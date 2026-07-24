@@ -97,25 +97,14 @@ public class NeuroShot : ProjectileHandler
                     
                     nextVectorData = dirToEnemy.normalized;
                 }
-            }
-            else
-            {
-                if (generation > 1)
-                {
-                    nextVectorData = transform.position + (transform.forward * maxDistance * 2);
-                }
-                else
-                {
-                    nextVectorData = transform.forward;
-                }
-            }
 
-            GameObject nextProj = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
-            NeuroShot logic = nextProj.GetComponent<NeuroShot>();
-            
-            if (logic != null)
-            {
-                logic.Setup(nextVectorData, projectileTeam, damage, speed, maxDistance, overshootDistance, generation - 1);
+                GameObject nextProj = Instantiate(projectilePrefab, transform.position, Quaternion.identity);
+                NeuroShot logic = nextProj.GetComponent<NeuroShot>();
+                
+                if (logic != null)
+                {
+                    logic.Setup(nextVectorData, projectileTeam, damage, speed, maxDistance, overshootDistance, generation - 1);
+                }
             }
         }
         else
