@@ -1,5 +1,6 @@
 using UnityEngine;
-public abstract class ProjectileHandler : MonoBehaviour
+using FishNet.Object;
+public abstract class ProjectileHandler : NetworkBehaviour
 {
     [HideInInspector] public int projectileTeam;
     protected float damage;

@@ -1,8 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using FishNet.Object;
 
-public abstract class EntityHandler : MonoBehaviour
+public abstract class EntityHandler : NetworkBehaviour
 {
     // UI References
     protected Camera MainCamera;

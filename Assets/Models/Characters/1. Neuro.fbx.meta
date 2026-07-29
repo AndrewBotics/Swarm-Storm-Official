@@ -641,7 +641,7 @@ ModelImporter:
     - name: clothes.R
       parentName: spine
       position: {x: 0.121605046, y: 0.07949835, z: -0.01640756}
-      rotation: {x: 0.69964105, y: 0.10248131, z: 0.699641, w: -0.102481395}
+      rotation: {x: 0.6996411, y: 0.10248131, z: 0.69964105, w: -0.102481395}
       scale: {x: 0.9999993, y: 1, z: 1}
     - name: clothes.R.001
       parentName: clothes.R
@@ -676,7 +676,7 @@ ModelImporter:
     - name: Skirt front 2.L
       parentName: skirt control
       position: {x: -0.07227973, y: 0.06903374, z: -0.11147721}
-      rotation: {x: -0.050028898, y: 0.08704573, z: -0.004376962, w: 0.99493766}
+      rotation: {x: -0.0500289, y: 0.08704573, z: -0.0043769623, w: 0.99493766}
       scale: {x: 0.99999994, y: 1.0000001, z: 1.0000002}
     - name: Skirt front 3.L
       parentName: Skirt front 2.L
@@ -686,7 +686,7 @@ ModelImporter:
     - name: Skirt front 2.R
       parentName: skirt control
       position: {x: 0.072279744, y: 0.06903374, z: -0.1114772}
-      rotation: {x: -0.05002889, y: -0.08704581, z: 0.004376965, w: 0.99493766}
+      rotation: {x: -0.050028894, y: -0.08704581, z: 0.0043769656, w: 0.99493766}
       scale: {x: 1, y: 0.9999999, z: 1}
     - name: Skirt front 3.R
       parentName: Skirt front 2.R
@@ -751,7 +751,7 @@ ModelImporter:
     - name: Low bowie 2.L
       parentName: Low bowie 1.L
       position: {x: 0.0000000013844925, y: 0.021911982, z: 0.00000003282912}
-      rotation: {x: 0.031638987, y: -0.019436711, z: 0.00932144, w: -0.999267}
+      rotation: {x: 0.031638984, y: -0.019436711, z: 0.009321439, w: -0.999267}
       scale: {x: 1, y: 1.0000002, z: 1.0000001}
     - name: Low bowie 1.R
       parentName: bowie control
@@ -761,7 +761,7 @@ ModelImporter:
     - name: Low bowie 2.R
       parentName: Low bowie 1.R
       position: {x: -0.0000000013844925, y: 0.021911982, z: 0.00000003282912}
-      rotation: {x: -0.031638987, y: -0.019436713, z: 0.00932144, w: 0.999267}
+      rotation: {x: -0.031638984, y: -0.019436713, z: 0.009321439, w: 0.999267}
       scale: {x: 0.99999994, y: 1.0000004, z: 1.0000001}
     - name: cape
       parentName: torso
@@ -1096,7 +1096,7 @@ ModelImporter:
     - name: Side hair 3.R.004
       parentName: Side hair 3.R.003
       position: {x: -0.0000000029448834, y: 0.027749674, z: -0.0000001299095}
-      rotation: {x: 0.18748549, y: -0.09839848, z: 0.13423811, w: 0.96806353}
+      rotation: {x: 0.1874855, y: -0.09839848, z: 0.13423812, w: 0.96806353}
       scale: {x: 1.0000002, y: 1.0000005, z: 1.0000006}
     - name: Side hair up.L.001
       parentName: hair control
@@ -1371,7 +1371,7 @@ ModelImporter:
     - name: little finger.R
       parentName: hand.R
       position: {x: -0.02133882, y: 0.058561485, z: -0.0049481825}
-      rotation: {x: -0.023576772, y: -0.03536021, z: -0.012633161, w: 0.9990167}
+      rotation: {x: -0.023576768, y: -0.03536021, z: -0.012633159, w: 0.9990167}
       scale: {x: 1.0000004, y: 1.0000005, z: 1.0000006}
     - name: little finger.R.001
       parentName: little finger.R

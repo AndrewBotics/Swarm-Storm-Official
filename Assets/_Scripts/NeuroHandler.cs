@@ -1,4 +1,5 @@
 using UnityEngine;
+using FishNet.Object;
 
 public class NeuroHandler : CharacterHandler
 {
@@ -7,7 +8,7 @@ public class NeuroHandler : CharacterHandler
     public GameObject ultPrefab;
 
     private readonly float NeuroBaseHP = 700.0f;
-    private readonly float NeuroBaseSpeed = 3.0f;
+    private readonly float NeuroBaseSpeed = 0.4f;
 
     // Attack Local Variables
     private readonly float NeuroAttack1Range = 4f;
@@ -44,17 +45,36 @@ public class NeuroHandler : CharacterHandler
         EntityCurrentHP = NeuroBaseHP;
         EntityBaseSpeed = NeuroBaseSpeed;
         EntityTeam = Constants.TEAM1;
+    }
+    
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+        
+        if (base.IsOwner)
+        {
+            Attack1Joy.OnJoystickReleased += HandleAttack1Release;
+            Attack2Joy.OnJoystickReleased += HandleAttack2Release;
+            UltJoy.OnJoystickReleased += HandleUltRelease;
+        }
+    }
 
-        Attack1Joy.OnJoystickReleased += HandleAttack1Release;
-        Attack2Joy.OnJoystickReleased += HandleAttack2Release;
-        UltJoy.OnJoystickReleased += HandleUltRelease;
+    public override void OnStopClient()
+    {
+        base.OnStopClient();
+        if (base.IsOwner)
+        {
+            if (Attack1Joy != null) Attack1Joy.OnJoystickReleased -= HandleAttack1Release;
+            if (Attack2Joy != null) Attack2Joy.OnJoystickReleased -= HandleAttack2Release;
+            if (UltJoy != null) UltJoy.OnJoystickReleased -= HandleUltRelease;
+        }
     }
    
     protected override void Update()
     {
         base.Update();
 
-        if (CameraScript.CurrentPlayerMode == EntityName)
+        if (base.IsOwner)
         {
             EntityTelegraph.ClearPreviews();
             if (Attack1Joy.GetJoystickVector() != Vector2.zero)
@@ -109,10 +129,10 @@ public class NeuroHandler : CharacterHandler
 
     private void HandleAttack1Release(Vector2 releaseVector, float holdTime)
     {
-        if (CameraScript.CurrentPlayerMode != EntityName) return;
+        if (!base.IsOwner) return;
+        
         if (releaseVector == Vector2.zero && holdTime > JoystickHandler.autoAimTime)
         {
-            Debug.Log("attack cancelled");
             return;
         }
 
@@ -126,39 +146,24 @@ public class NeuroHandler : CharacterHandler
                 aimDirection = (target.position - transform.position).normalized;
                 aimDirection.y = 0f;
             }
-            else 
-            {
-                return; 
-            }
+            else return; 
         }
         else
         {
-            Vector3 camForward = MainCamera.transform.forward;
+            Vector3 camForward = Camera.main.transform.forward;
             camForward.y = 0f;
-            Vector3 camRight = MainCamera.transform.right;
+            Vector3 camRight = Camera.main.transform.right;
             camRight.y = 0f;
             
             aimDirection = (camForward.normalized * releaseVector.y + camRight.normalized * releaseVector.x).normalized;
         }
 
-        FireAttack1(aimDirection);
+        ServerFireAttack1(aimDirection);
         Attack1Joy.AddCooldown(NeuroAttack1Cooldown);
     }
 
-    private void SpawnProjectile(Vector3 startPos, Vector3 endPos, float damage)
-    {
-        if (attack1Prefab != null)
-        {
-            GameObject proj = Instantiate(attack1Prefab, startPos, Quaternion.identity);
-            NeuroShot logic = proj.GetComponent<NeuroShot>();
-            if (logic != null)
-            {
-                logic.Setup(endPos, EntityTeam, damage, NeuroAttack1Speed, NeuroAttack1Range2, NeuroAttack1Overshoot, 1);
-            }
-        }
-    }
-
-    private void FireAttack1(Vector3 aimDirection)
+    [ServerRpc]
+    private void ServerFireAttack1(Vector3 aimDirection)
     {
         Vector3 rightDirection = Vector3.Cross(Vector3.up, aimDirection).normalized;
         float startOffset = 0.5f;
@@ -180,14 +185,25 @@ public class NeuroHandler : CharacterHandler
         SpawnProjectile(rightStart, rightEnd, totalDamage);
     }
 
+    private void SpawnProjectile(Vector3 startPos, Vector3 endPos, float damage)
+    {
+        if (attack1Prefab != null)
+        {
+            GameObject proj = Instantiate(attack1Prefab, startPos, Quaternion.identity);
+            NeuroShot logic = proj.GetComponent<NeuroShot>();
+            if (logic != null)
+            {
+                logic.Setup(endPos, EntityTeam, damage, NeuroAttack1Speed, NeuroAttack1Range2, NeuroAttack1Overshoot, 1);
+            }
+            
+            base.ServerManager.Spawn(proj);
+        }
+    }
+
     private void HandleAttack2Release(Vector2 releaseVector, float holdTime)
     {
-        if (CameraScript.CurrentPlayerMode != EntityName) return;
-        if (releaseVector == Vector2.zero && holdTime > JoystickHandler.autoAimTime)
-        {
-            Debug.Log("attack cancelled");
-            return;
-        }
+        if (!base.IsOwner) return;
+        if (releaseVector == Vector2.zero && holdTime > JoystickHandler.autoAimTime) return;
 
         Vector3 aimDirection = Vector3.zero;
 
@@ -199,26 +215,24 @@ public class NeuroHandler : CharacterHandler
                 aimDirection = (target.position - transform.position).normalized;
                 aimDirection.y = 0f;
             }
-            else 
-            {
-                return; 
-            }
+            else return; 
         }
         else
         {
-            Vector3 camForward = MainCamera.transform.forward;
+            Vector3 camForward = Camera.main.transform.forward;
             camForward.y = 0f;
-            Vector3 camRight = MainCamera.transform.right;
+            Vector3 camRight = Camera.main.transform.right;
             camRight.y = 0f;
             
             aimDirection = (camForward.normalized * releaseVector.y + camRight.normalized * releaseVector.x).normalized;
         }
 
-        FireAttack2(aimDirection);
+        ServerFireAttack2(aimDirection);
         Attack2Joy.AddCooldown(NeuroAttack2Cooldown);
     }
 
-    private void FireAttack2(Vector3 aimDirection)
+    [ServerRpc]
+    private void ServerFireAttack2(Vector3 aimDirection)
     {
         float startOffset = 0.5f;
         Vector3 startPos = transform.position + (aimDirection * startOffset);
@@ -226,25 +240,20 @@ public class NeuroHandler : CharacterHandler
         if (attack2Prefab != null)
         {
             GameObject beamObj = Instantiate(attack2Prefab, startPos, Quaternion.LookRotation(aimDirection));
-            
-            // beamObj.transform.SetParent(this.transform);
-
             NeuroBeam logic = beamObj.GetComponent<NeuroBeam>();
             if (logic != null)
             {
                 logic.Setup(EntityTeam, GetAttackValue(NeuroAttack2BaseDamage), NeuroAttack2Duration, NeuroAttack2Ticks, NeuroAttack2Width, NeuroAttack2Range, transform);
             }
+            
+            base.ServerManager.Spawn(beamObj);
         }
     }
 
     private void HandleUltRelease(Vector2 releaseVector, float holdTime)
     {
-        if (CameraScript.CurrentPlayerMode != EntityName) return;
-        if (releaseVector == Vector2.zero && holdTime > JoystickHandler.autoAimTime)
-        {
-            Debug.Log("attack cancelled");
-            return;
-        }
+        if (!base.IsOwner) return;
+        if (releaseVector == Vector2.zero && holdTime > JoystickHandler.autoAimTime) return;
 
         Vector3 aimDirection = Vector3.zero;
 
@@ -256,33 +265,30 @@ public class NeuroHandler : CharacterHandler
                 aimDirection = (target.position - transform.position).normalized;
                 aimDirection.y = 0f;
             }
-            else 
-            {
-                return; 
-            }
+            else return; 
         }
         else
         {
-            Vector3 camForward = MainCamera.transform.forward;
+            Vector3 camForward = Camera.main.transform.forward;
             camForward.y = 0f;
-            Vector3 camRight = MainCamera.transform.right;
+            Vector3 camRight = Camera.main.transform.right;
             camRight.y = 0f;
             
             aimDirection = (camForward.normalized * releaseVector.y + camRight.normalized * releaseVector.x).normalized;
         }
 
-        FireUlt(aimDirection);
+        ServerFireUlt(aimDirection);
         UltJoy.AddCooldown(NeuroUltCooldown);
     }
 
-    private void FireUlt(Vector3 aimDirection)
+    [ServerRpc]
+    private void ServerFireUlt(Vector3 aimDirection)
     {
         Vector3 rightDirection = Vector3.Cross(Vector3.up, aimDirection).normalized;
         float startOffset = 0.5f;
 
         Vector3 startPos = transform.position + (aimDirection * startOffset);
         startPos.y = Telegraph.offset;
-
 
         Vector3 endPos = startPos + (aimDirection * NeuroUltRange);
 
@@ -294,6 +300,8 @@ public class NeuroHandler : CharacterHandler
             {
                 logic.Setup(endPos, EntityTeam, GetAttackValue(NeuroUltBaseDamage), NeuroUltSpeed, NeuroUltRange2, NeuroUltOvershoot, NeuroUltCount);
             }
+            
+            base.ServerManager.Spawn(proj);
         }
     }
 }
