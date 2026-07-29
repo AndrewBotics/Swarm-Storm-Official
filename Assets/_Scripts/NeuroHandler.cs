@@ -8,7 +8,7 @@ public class NeuroHandler : CharacterHandler
     public GameObject ultPrefab;
 
     private readonly float NeuroBaseHP = 700.0f;
-    private readonly float NeuroBaseSpeed = 0.4f;
+    private readonly float NeuroBaseSpeed = 0.25f;
 
     // Attack Local Variables
     private readonly float NeuroAttack1Range = 4f;

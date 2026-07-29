@@ -31,6 +31,7 @@ public abstract class ProjectileHandler : NetworkBehaviour
 
     protected virtual void Update()
     {
+        if (!base.IsServerInitialized) return;
         MoveProjectile();
         CheckMaxDistance();
     }
@@ -50,6 +51,7 @@ public abstract class ProjectileHandler : NetworkBehaviour
 
     protected virtual void OnTriggerEnter(Collider other)
     {
+        if (!base.IsServerInitialized) return;
         EntityHandler entity = other.GetComponent<EntityHandler>();
         
         if (entity != null)
@@ -70,6 +72,9 @@ public abstract class ProjectileHandler : NetworkBehaviour
 
     protected virtual void DestroyProjectile()
     {
-        Destroy(gameObject);
+        if (base.IsServerInitialized)
+        {
+            base.ServerManager.Despawn(gameObject);
+        }
     }
 }

@@ -105,6 +105,11 @@ public class NeuroShot : ProjectileHandler
                 {
                     logic.Setup(nextVectorData, projectileTeam, damage, speed, maxDistance, overshootDistance, generation - 1);
                 }
+
+                if (base.IsServerInitialized)
+                {
+                    base.ServerManager.Spawn(nextProj);
+                }
             }
         }
         else
@@ -115,6 +120,7 @@ public class NeuroShot : ProjectileHandler
 
     protected override void OnTriggerEnter(Collider other)
     {
+        if (!base.IsServerInitialized) return;
         EntityHandler entity = other.GetComponent<EntityHandler>();
         
         if (entity != null)
