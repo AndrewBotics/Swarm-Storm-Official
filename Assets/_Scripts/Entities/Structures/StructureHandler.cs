@@ -5,9 +5,9 @@ using System.Collections;
 public abstract class StructureHandler : EntityHandler
 {
     protected float StructureAttackRadius;
-    protected float StructureAttackVelocity = 0.5f;
+    protected float StructureAttackVelocity = 5.0f;
     protected float StructureAttackDamage;
-    protected float StructureCooldown;
+    protected float StructureCooldown = 1.5f;
 
     public GameObject projectilePrefab;
     public Transform firePoint;

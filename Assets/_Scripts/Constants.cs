@@ -168,31 +168,25 @@ public class Constants : NetworkBehaviour
 
         foreach (Collider hit in hitColliders)
         {
-            if (hit is CapsuleCollider)
+            EntityHandler eHandler = hit.GetComponentInParent<EntityHandler>();
+            if (eHandler==null) continue;
+            if (eHandler.gameObject==searcherTransform.gameObject) continue;
+            if (hit.GetComponentInParent<ProjectileHandler>()!=null) continue;
+
+            int targetTeam = eHandler.EntityTeam;
+
+            if (targetTeam != -1)
             {
-                if (hit.transform == searcherTransform) continue;
+                bool isAlly = (targetTeam == searcherTeam);
+                bool isEnemy = !isAlly;
 
-                int targetTeam = -1;
-
-                EntityHandler eHandler = hit.GetComponent<EntityHandler>();
-                if (eHandler != null)
+                if ((targetEnemies && isEnemy) || (targetAllies && isAlly))
                 {
-                    targetTeam = eHandler.EntityTeam;
-                }
-
-                if (targetTeam != -1)
-                {
-                    bool isAlly = (targetTeam == searcherTeam);
-                    bool isEnemy = !isAlly;
-
-                    if ((targetEnemies && isEnemy) || (targetAllies && isAlly))
+                    float distanceToTarget = Vector3.Distance(searcherTransform.position, hit.transform.position);
+                    if (distanceToTarget < closestDistance)
                     {
-                        float distanceToTarget = Vector3.Distance(searcherTransform.position, hit.transform.position);
-                        if (distanceToTarget < closestDistance)
-                        {
-                            closestDistance = distanceToTarget;
-                            bestTarget = hit.transform;
-                        }
+                        closestDistance = distanceToTarget;
+                        bestTarget = hit.transform;
                     }
                 }
             }
@@ -209,31 +203,25 @@ public class Constants : NetworkBehaviour
 
         foreach (Collider hit in hitColliders)
         {
-            if (hit is CapsuleCollider)
+            EntityHandler eHandler = hit.GetComponentInParent<EntityHandler>();
+            if (eHandler==null) continue;
+            if (eHandler.gameObject==searcherTransform.gameObject) continue;
+            if (hit.GetComponentInParent<ProjectileHandler>()!=null) continue;
+            
+            int targetTeam = eHandler.EntityTeam;
+
+            if (targetTeam != -1)
             {
-                if (hit.transform == searcherTransform) continue;
+                bool isAlly = (targetTeam == searcherTeam);
+                bool isEnemy = !isAlly;
 
-                int targetTeam = -1;
-
-                EntityHandler eHandler = hit.GetComponent<EntityHandler>();
-                if (eHandler != null)
+                if ((targetEnemies && isEnemy) || (targetAllies && isAlly))
                 {
-                    targetTeam = eHandler.EntityTeam;
-                }
-
-                if (targetTeam != -1)
-                {
-                    bool isAlly = (targetTeam == searcherTeam);
-                    bool isEnemy = !isAlly;
-
-                    if ((targetEnemies && isEnemy) || (targetAllies && isAlly))
+                    float targetHPPercent = eHandler.GetHPPercent();
+                    if (targetHPPercent < weakestPercent)
                     {
-                        float targetHPPercent = eHandler.GetHPPercent();
-                        if (targetHPPercent < weakestPercent)
-                        {
-                            weakestPercent = targetHPPercent;
-                            bestTarget = hit.transform;
-                        }
+                        weakestPercent = targetHPPercent;
+                        bestTarget = hit.transform;
                     }
                 }
             }

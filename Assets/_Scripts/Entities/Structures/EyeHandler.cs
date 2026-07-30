@@ -10,7 +10,6 @@ public class EyeHandler : StructureHandler
     private readonly float EyeBaseSpeed = 0f;
     private readonly float EyeAttackRadius = 4.375f;
     private readonly float EyeAttackDamage = 200f;
-    private float EyeCooldown = 1f;
     
     protected override void Start()
     {
@@ -22,6 +21,5 @@ public class EyeHandler : StructureHandler
         EntityBaseSpeed = EyeBaseSpeed;
         StructureAttackRadius = EyeAttackRadius;
         StructureAttackDamage = EyeAttackDamage;
-        StructureCooldown = EyeCooldown;
     }
 }

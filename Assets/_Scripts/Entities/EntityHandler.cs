@@ -15,7 +15,7 @@ public abstract class EntityHandler : NetworkBehaviour
     protected Quaternion spawnRotation;
 
     // Stats
-    protected string EntityName;
+    [HideInInspector] public string EntityName;
     protected float EntityBaseHP;
     protected float EntityBaseSpeed;
     [HideInInspector] public int EntityTeam;
@@ -116,6 +116,7 @@ public abstract class EntityHandler : NetworkBehaviour
         ChangeHPValue(-amount/GetDefenseValue()); 
         
         SetHP(GetHPValue()/EntityMaxHP);
+        //Debug.Log(EntityName +" took "+amount+" damage!");
     }
 
     public virtual void Heal(float amount)

@@ -5,8 +5,8 @@ public class HomingProjectileHandler : ProjectileHandler
 {
     protected Transform target;
     
-    private float acceleration = 0.5f;
-    private float maxSpeed = 10f;
+    private float acceleration = 2.5f;
+    private float maxSpeed = 20f;
 
     protected override void Update()
     {
@@ -84,6 +84,8 @@ public class HomingProjectileHandler : ProjectileHandler
             else if (entity.EntityTeam != -1 && entity.EntityTeam==projectileTeam)
             {
                 entity.Heal(damage);
+                OnHit(entity);
+                DestroyProjectile();
             }
         }
     }

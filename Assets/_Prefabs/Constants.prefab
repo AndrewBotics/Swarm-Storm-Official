@@ -51,8 +51,8 @@ MonoBehaviour:
   topNlingPrefab: {fileID: 9141773902364309507, guid: d825f121ce5d6e54e810ee9a2e0e9dfa, type: 3}
   junNlingPrefab: {fileID: 9141773902364309507, guid: d825f121ce5d6e54e810ee9a2e0e9dfa, type: 3}
   botNlingPrefab: {fileID: 9141773902364309507, guid: d825f121ce5d6e54e810ee9a2e0e9dfa, type: 3}
-  tower1Prefab: {fileID: 2415006967326273247, guid: 31b680291feafbb4691a6fcd6ae1eca9, type: 3}
-  tower2Prefab: {fileID: 2415006967326273247, guid: 31b680291feafbb4691a6fcd6ae1eca9, type: 3}
+  tower1Prefab: {fileID: 8767164840714394452, guid: 8816e6b51b2b5294c96c27ac0b16c262, type: 3}
+  tower2Prefab: {fileID: 5076783700601204841, guid: c6460443504b02b4c83ce5a34ee11f52, type: 3}
   eyePrefab: {fileID: 2415006967326273247, guid: 31b680291feafbb4691a6fcd6ae1eca9, type: 3}
 --- !u!114 &5208874619342151506
 MonoBehaviour:
@@ -84,7 +84,7 @@ MonoBehaviour:
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 0
-  _initializedTimestamp: -8584161798451571718
+  _initializedTimestamp: -8584161581644929694
   _localLevelOfDetailCalculationType: 0
   _useLevelOfDetail: 0
   _useRootLevelOfDetail: 1

@@ -6,9 +6,8 @@ public class Tower2Handler : StructureHandler
 {
     private readonly float Tower2BaseHP = 20000f;
     private readonly float Tower2BaseSpeed = 0f;
-    private readonly float Tower2AttackRadius = 2.5f;
+    private readonly float Tower2AttackRadius = 3.125f;
     private readonly float Tower2AttackDamage = 75f;
-    private float Tower2Cooldown = 1f;
 
     protected override void Start()
     {
@@ -20,6 +19,5 @@ public class Tower2Handler : StructureHandler
         EntityBaseSpeed = Tower2BaseSpeed;
         StructureAttackRadius = Tower2AttackRadius;
         StructureAttackDamage = Tower2AttackDamage;
-        StructureCooldown = Tower2Cooldown;
     }
 }

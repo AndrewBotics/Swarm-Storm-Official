@@ -75,7 +75,7 @@ public class NeuroShot : ProjectileHandler
     {
         if (projectilePrefab != null)
         {
-            Transform target = Constants.FindClosestTarget(transform, projectileTeam, maxDistance * 2, true, false);
+            Transform target = Constants.FindClosestTarget(transform, projectileTeam, maxDistance * 2);
             Vector3 nextVectorData; 
             
             if (target != null)
@@ -131,7 +131,9 @@ public class NeuroShot : ProjectileHandler
             if (entity.EntityTeam != -1 && entity.EntityTeam != projectileTeam)
             {
                 entity.TakeDamage(damage, projectileTeam);
+                // Debug.Log("Attacked " + entity.EntityName);
                 OnHit(entity);
+                // Debug.Log(entity.EntityName+": "+entity.GetHPValue());
             }
         }
     }
