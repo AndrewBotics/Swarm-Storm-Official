@@ -3106,7 +3106,6 @@ MonoBehaviour:
   EntityTeam: 0
   CharController: {fileID: 99649110528164921}
   isDead: 0
-  isPlayer: 1
   attack1Prefab: {fileID: 1660645778265744451, guid: de056e6e2d87020409370f7f79dc58b5, type: 3}
   attack2Prefab: {fileID: 5320626598175224018, guid: 79c46771385ba6048aa2b8ce6005c85b, type: 3}
   ultPrefab: {fileID: 1462537444560807855, guid: 98e94e006e8bc6b4687de51cd55ad710, type: 3}
@@ -3143,6 +3142,8 @@ MonoBehaviour:
   <PredictedOwner>k__BackingField: {fileID: 0}
   NetworkBehaviours:
   - {fileID: 1456067946912765341}
+  - {fileID: 5869438007483649699}
+  - {fileID: 18785601566674647}
   InitializedParentNetworkBehaviour: {fileID: 0}
   InitializedNestedNetworkObjects: []
   RuntimeParentNetworkBehaviour: {fileID: 0}
@@ -3153,7 +3154,7 @@ MonoBehaviour:
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 0
-  _initializedTimestamp: -8584162675456699872
+  _initializedTimestamp: -8584162453809584624
   _localLevelOfDetailCalculationType: 0
   _useLevelOfDetail: 0
   _useRootLevelOfDetail: 1
@@ -3172,9 +3173,9 @@ MonoBehaviour:
   _spectatorInterpolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
-  <PrefabId>k__BackingField: 8
+  <PrefabId>k__BackingField: 9
   <SpawnableCollectionId>k__BackingField: 0
-  <AssetPathHash>k__BackingField: 5200858417061361171
+  <AssetPathHash>k__BackingField: 16333309915282619768
   SceneId: 0
   SerializedTransformProperties:
     Position: {x: 30, y: 0, z: -6.25}
@@ -3193,9 +3194,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2836e36774ca1c4bbbee976e17b649c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FishNet.Runtime::FishNet.Component.Transforming.NetworkTransform
-  _componentIndexCache: 255
+  _componentIndexCache: 1
   _addedNetworkObject: {fileID: 6413957914532085693}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 6413957914532085693}
   _componentConfiguration: 0
   _synchronizeParent: 0
   _packing:
@@ -3239,9 +3240,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8cac635f24954048aad3a6ff9110beb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FishNet.Runtime::FishNet.Component.Animating.NetworkAnimator
-  _componentIndexCache: 255
+  _componentIndexCache: 2
   _addedNetworkObject: {fileID: 6413957914532085693}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 6413957914532085693}
   IgnoredParameters: []
   _animator: {fileID: 4298683865158964490}
   _synchronizeWhenDisabled: 0

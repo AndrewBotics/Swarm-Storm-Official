@@ -8,7 +8,7 @@ public class NeuroHandler : CharacterHandler
     public GameObject ultPrefab;
 
     private readonly float NeuroBaseHP = 700.0f;
-    private readonly float NeuroBaseSpeed = 0.25f;
+    private readonly float NeuroBaseSpeed = 3f;
 
     // Attack Local Variables
     private readonly float NeuroAttack1Range = 4f;
@@ -42,7 +42,7 @@ public class NeuroHandler : CharacterHandler
         EntityName = "NeuroPlayer";
         EntityBaseHP = NeuroBaseHP;
         EntityMaxHP = NeuroBaseHP;
-        EntityCurrentHP = NeuroBaseHP;
+        SetHPValue(NeuroBaseHP);
         EntityBaseSpeed = NeuroBaseSpeed;
         EntityTeam = Constants.TEAM1;
     }
@@ -150,20 +150,21 @@ public class NeuroHandler : CharacterHandler
         }
         else
         {
-            Vector3 camForward = Camera.main.transform.forward;
+            Vector3 camForward = Constants.MainCamera.transform.forward;
             camForward.y = 0f;
-            Vector3 camRight = Camera.main.transform.right;
+            Vector3 camRight = Constants.MainCamera.transform.right;
             camRight.y = 0f;
             
             aimDirection = (camForward.normalized * releaseVector.y + camRight.normalized * releaseVector.x).normalized;
         }
 
-        ServerFireAttack1(aimDirection);
+        int randomSeed = Random.Range(int.MinValue, int.MaxValue);
+        ServerFireAttack1(aimDirection, randomSeed);
         Attack1Joy.AddCooldown(NeuroAttack1Cooldown);
     }
 
     [ServerRpc]
-    private void ServerFireAttack1(Vector3 aimDirection)
+    private void ServerFireAttack1(Vector3 aimDirection, int seed)
     {
         Vector3 rightDirection = Vector3.Cross(Vector3.up, aimDirection).normalized;
         float startOffset = 0.5f;
@@ -180,12 +181,12 @@ public class NeuroHandler : CharacterHandler
 
         float totalDamage = GetAttackValue(NeuroAttack1BaseDamage);
 
-        SpawnProjectile(leftStart, leftEnd, totalDamage);
-        SpawnProjectile(baseStart, baseEnd, totalDamage);
-        SpawnProjectile(rightStart, rightEnd, totalDamage);
+        SpawnProjectile(leftStart, leftEnd, totalDamage, seed);
+        SpawnProjectile(baseStart, baseEnd, totalDamage, seed);
+        SpawnProjectile(rightStart, rightEnd, totalDamage, seed);
     }
 
-    private void SpawnProjectile(Vector3 startPos, Vector3 endPos, float damage)
+    private void SpawnProjectile(Vector3 startPos, Vector3 endPos, float damage, int seed)
     {
         if (attack1Prefab != null)
         {
@@ -193,7 +194,7 @@ public class NeuroHandler : CharacterHandler
             NeuroShot logic = proj.GetComponent<NeuroShot>();
             if (logic != null)
             {
-                logic.Setup(endPos, EntityTeam, damage, NeuroAttack1Speed, NeuroAttack1Range2, NeuroAttack1Overshoot, 1);
+                logic.Setup(endPos, EntityTeam, damage, NeuroAttack1Speed, NeuroAttack1Range2, NeuroAttack1Overshoot, 1, seed);
             }
             
             base.ServerManager.Spawn(proj);
@@ -219,9 +220,9 @@ public class NeuroHandler : CharacterHandler
         }
         else
         {
-            Vector3 camForward = Camera.main.transform.forward;
+            Vector3 camForward = Constants.MainCamera.transform.forward;
             camForward.y = 0f;
-            Vector3 camRight = Camera.main.transform.right;
+            Vector3 camRight = Constants.MainCamera.transform.right;
             camRight.y = 0f;
             
             aimDirection = (camForward.normalized * releaseVector.y + camRight.normalized * releaseVector.x).normalized;
@@ -269,20 +270,21 @@ public class NeuroHandler : CharacterHandler
         }
         else
         {
-            Vector3 camForward = Camera.main.transform.forward;
+            Vector3 camForward = Constants.MainCamera.transform.forward;
             camForward.y = 0f;
-            Vector3 camRight = Camera.main.transform.right;
+            Vector3 camRight = Constants.MainCamera.transform.right;
             camRight.y = 0f;
             
             aimDirection = (camForward.normalized * releaseVector.y + camRight.normalized * releaseVector.x).normalized;
         }
 
-        ServerFireUlt(aimDirection);
+        int randomSeed = Random.Range(int.MinValue, int.MaxValue);
+        ServerFireUlt(aimDirection, randomSeed);
         UltJoy.AddCooldown(NeuroUltCooldown);
     }
 
     [ServerRpc]
-    private void ServerFireUlt(Vector3 aimDirection)
+    private void ServerFireUlt(Vector3 aimDirection, int seed)
     {
         Vector3 rightDirection = Vector3.Cross(Vector3.up, aimDirection).normalized;
         float startOffset = 0.5f;
@@ -298,7 +300,7 @@ public class NeuroHandler : CharacterHandler
             NeuroShot logic = proj.GetComponent<NeuroShot>();
             if (logic != null)
             {
-                logic.Setup(endPos, EntityTeam, GetAttackValue(NeuroUltBaseDamage), NeuroUltSpeed, NeuroUltRange2, NeuroUltOvershoot, NeuroUltCount);
+                logic.Setup(endPos, EntityTeam, GetAttackValue(NeuroUltBaseDamage), NeuroUltSpeed, NeuroUltRange2, NeuroUltOvershoot, NeuroUltCount, seed);
             }
             
             base.ServerManager.Spawn(proj);

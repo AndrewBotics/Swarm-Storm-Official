@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using FishNet.Object;
+using FishNet.Object.Synchronizing;
 
 public abstract class EntityHandler : NetworkBehaviour
 {
@@ -23,11 +24,12 @@ public abstract class EntityHandler : NetworkBehaviour
     protected int EntityLevel = 1;
     protected float EntityHPMultiplier = 1.0f;
     protected float EntityAttackMultiplier = 1.0f;
-    protected float EntityCurrentHP;
+    protected readonly SyncVar<float> EntityCurrentHP = new SyncVar<float>();
     protected float EntityMaxHP;
 
     // Statuses
-    // protected float EntityAttackBoost = 1.0f;
+    protected Vector3 currentKnockbackVelocity;
+    protected float knockbackTimer;
 
     protected virtual void Start()
     {
@@ -40,22 +42,44 @@ public abstract class EntityHandler : NetworkBehaviour
 
     protected virtual void Update()
     {
-        SetHP(EntityCurrentHP/EntityMaxHP);
+        SetHP(GetHPValue()/EntityMaxHP);
     }
 
-    protected float GetHPValue(){
-        return EntityCurrentHP;
+    public void SetTeam(int team)
+    {
+        EntityTeam = team;
     }
 
-    protected float GetAttackValue(float basePower){
+    protected void SetHPValue(float f)
+    {
+        EntityCurrentHP.Value = f;
+    }
+
+    public float GetHPValue()
+    {
+        return EntityCurrentHP.Value;
+    }
+
+    public void ChangeHPValue(float f)
+    {
+        SetHPValue(GetHPValue()+f);
+        if (GetHPValue()>EntityMaxHP) SetHPValue(EntityMaxHP);
+    }
+
+    public float GetHPPercent()
+    {
+        return GetHPValue()/EntityMaxHP;
+    }
+
+    public float GetAttackValue(float basePower){
         return basePower * EntityAttackMultiplier;
     }
 
-    protected float GetDefenseValue(){
+    public float GetDefenseValue(){
         return 1.0f;
     }
 
-    protected float GetSpeedValue(){
+    public float GetSpeedValue(){
         return EntityBaseSpeed;
     }
 
@@ -67,10 +91,10 @@ public abstract class EntityHandler : NetworkBehaviour
     public void LevelUp(){
         EntityLevel++;
         EntityHPMultiplier += 0.15f;
-        float _minus = EntityMaxHP - EntityCurrentHP;
+        float _minus = EntityMaxHP - GetHPValue();
         EntityMaxHP = EntityBaseHP * EntityHPMultiplier;
-        EntityCurrentHP = EntityMaxHP - _minus;
-        SetHP(EntityCurrentHP/EntityMaxHP);
+        SetHPValue(EntityMaxHP - _minus);
+        SetHP(GetHPValue()/EntityMaxHP);
 
         EntityAttackMultiplier += 0.1f;
     }
@@ -89,17 +113,23 @@ public abstract class EntityHandler : NetworkBehaviour
 
     public virtual void TakeDamage(float amount, int attackerTeam)
     {
-        EntityCurrentHP -= amount / GetDefenseValue(); 
+        ChangeHPValue(-amount/GetDefenseValue()); 
         
-        SetHP(EntityCurrentHP / EntityMaxHP);
+        SetHP(GetHPValue()/EntityMaxHP);
+    }
+
+    public virtual void Heal(float amount)
+    {
+        ChangeHPValue(amount);
+        SetHP(GetHPValue()/EntityMaxHP);
     }
 
     protected abstract void Die();
 
     public virtual void ApplyKnockback(Vector3 direction, float distance, float duration)
     {
-        StartCoroutine(KnockbackRoutine(direction, distance, duration));
+        if (duration <= 0) return;
+        currentKnockbackVelocity = direction * (distance/duration);
+        knockbackTimer = duration;
     }
-
-    protected abstract IEnumerator KnockbackRoutine(Vector3 dir, float dist, float dur);
 }

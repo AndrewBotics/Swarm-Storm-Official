@@ -1,8 +1,9 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using FishNet.Object;
 
-public class Constants : MonoBehaviour
+public class Constants : NetworkBehaviour
 {
     // Object constants
     public static Camera MainCamera { get; private set; }
@@ -15,7 +16,9 @@ public class Constants : MonoBehaviour
     public GameObject topNlingPrefab;
     public GameObject junNlingPrefab;
     public GameObject botNlingPrefab;
-    public GameObject teamTowerPrefab;
+    public GameObject tower1Prefab;
+    public GameObject tower2Prefab;
+    public GameObject eyePrefab;
 
     // Value constants
     public static readonly int WILD = 0;
@@ -50,22 +53,21 @@ public class Constants : MonoBehaviour
     public static Vector3 JUNGLEBOSS = new Vector3(0f, 0f, 0f);
     public static Vector3[] JUN = new Vector3[]{JUN1, JUN2, JUN3, JUN4, JUN5, JUN6, JUN7, JUN8, JUNGLEBOSS};
 
-    /*
-    public static Vector3 ONEBASE = new Vector3(28.75f, 1.25f, 0f);
-    public static Vector3 ONETOWER1 = new Vector3(25f, 1.25f, -15f);
-    public static Vector3 ONETOWER2 = new Vector3(12.5f, 1.25f, -16.25f);
-    public static Vector3 ONETOWER3 = new Vector3(25f, 1.25f, 15f);
-    public static Vector3 ONETOWER4 = new Vector3(12.5f, 1.25f, 16.25f);
-    public static Vector3[] ONE = new Vector3[]{ONEBASE, ONETOWER1, ONETOWER2, ONETOWER3, ONETOWER4};
+    public static Vector3 TEALEYE = new Vector3(28.75f, 0f, 0f);
+    public static Vector3 TEALTOWERA = new Vector3(25f, 0f, -15f);
+    public static Vector3 TEALTOWERB = new Vector3(12.5f, 0f, -16.25f);
+    public static Vector3 TEALTOWERC = new Vector3(25f, 0f, 15f);
+    public static Vector3 TEALTOWERD = new Vector3(12.5f, 0f, 16.25f);
+    public static Vector3[] TEALPOS = new Vector3[]{TEALEYE, TEALTOWERA, TEALTOWERB, TEALTOWERC, TEALTOWERD};
 
-    public static Vector3 TWOBASE = new Vector3(-28.75f, 1.25f, 0f);
-    public static Vector3 TWOTOWER1 = new Vector3(-25f, 1.25f, -15f);
-    public static Vector3 TWOTOWER2 = new Vector3(-12.5f, 1.25f, -16.25f);
-    public static Vector3 TWOTOWER3 = new Vector3(-25f, 1.25f, 15f);
-    public static Vector3 TWOTOWER4 = new Vector3(-12.5f, 1.25f, 16.25f);
-    public static Vector3[] TWO = new Vector3[]{TWOBASE, TWOTOWER1, TWOTOWER2, TWOTOWER3, TWOTOWER4};
-    */
+    public static Vector3 CRIMEYE = new Vector3(-28.75f, 0f, 0f);
+    public static Vector3 CRIMTOWERA = new Vector3(-25f, 0f, -15f);
+    public static Vector3 CRIMTOWERB = new Vector3(-12.5f, 0f, -16.25f);
+    public static Vector3 CRIMTOWERC = new Vector3(-25f, 0f, 15f);
+    public static Vector3 CRIMTOWERD = new Vector3(-12.5f, 0f, 16.25f);
+    public static Vector3[] CRIMPOS = new Vector3[]{CRIMEYE, CRIMTOWERA, CRIMTOWERB, CRIMTOWERC, CRIMTOWERD};
 
+    public static GameObject[] TOWERPREFABS;
     private HashSet<Vector3> respawningPositions = new HashSet<Vector3>();
     
 
@@ -76,44 +78,48 @@ public class Constants : MonoBehaviour
         Attack1Joy = GameObject.FindWithTag("Attack1Joy").GetComponent<JoystickHandler>();
         Attack2Joy = GameObject.FindWithTag("Attack2Joy").GetComponent<JoystickHandler>();
         UltJoy = GameObject.FindWithTag("UltJoy").GetComponent<JoystickHandler>();
+        TOWERPREFABS = new GameObject[]{eyePrefab, tower2Prefab, tower1Prefab, tower2Prefab, tower1Prefab};
     }
 
-    private void Start()
+    public override void OnStartServer()
     {
+        base.OnStartServer();
         foreach (Vector3 pos in TOP){
-            Instantiate(topNlingPrefab, pos, Quaternion.identity);
+            GameObject go = Instantiate(topNlingPrefab, pos, Quaternion.identity);
+            base.ServerManager.Spawn(go);
         }
 
         foreach (Vector3 pos in JUN)
         {
-            Instantiate(junNlingPrefab, pos, Quaternion.identity);
+            GameObject go = Instantiate(junNlingPrefab, pos, Quaternion.identity);
+            base.ServerManager.Spawn(go);
         }
         
         foreach (Vector3 pos in BOT)
         {
-            Instantiate(botNlingPrefab, pos, Quaternion.identity);
+            GameObject go = Instantiate(botNlingPrefab, pos, Quaternion.identity);
+            base.ServerManager.Spawn(go);
         }
 
-        /*
+        
 
-        foreach (Vector3 pos in ONE)
-        {
-            GameObject go = Instantiate(teamTowerPrefab, pos, Quaternion.identity);
-            TowerHandler th = go.GetComponent<TowerHandler>();
-            th.Team = TEAM1;
+        for (int i = 0; i<5; i++){
+            CreateTower(TOWERPREFABS[i], TEALPOS[i], TEAM1);
+            CreateTower(TOWERPREFABS[i], CRIMPOS[i], TEAM2);
         }
+    }
 
-        foreach (Vector3 pos in TWO)
-        {
-            GameObject go = Instantiate(teamTowerPrefab, pos, Quaternion.identity);
-            TowerHandler th = go.GetComponent<TowerHandler>();
-            th.Team = TEAM2;
-        }
-        */
+    private void CreateTower(GameObject prefab, Vector3 pos, int team)
+    {
+        GameObject go = Instantiate(prefab, pos, Quaternion.identity);
+        StructureHandler sh = go.GetComponent<StructureHandler>();
+        sh.SetTeam(team);
+        base.ServerManager.Spawn(go);
     }
 
     private void Update()
     {
+        if (!base.IsServerInitialized) return;
         foreach (Vector3 pos in TOP){
             Vector3 pos2 = new Vector3(pos.x, 0.75f, pos.z);
             if (!respawningPositions.Contains(pos) && isEmptyAtVector3(pos2))
@@ -149,7 +155,9 @@ public class Constants : MonoBehaviour
     {
         respawningPositions.Add(pos);
         yield return new WaitForSeconds(delay);
-        Instantiate(prefab, pos, Quaternion.identity);
+        GameObject go = Instantiate(prefab, pos, Quaternion.identity);
+        base.ServerManager.Spawn(go);
+        respawningPositions.Remove(pos);
     }
 
     public static Transform FindClosestTarget(Transform searcherTransform, int searcherTeam, float radius, bool targetEnemies = true, bool targetAllies = false)
@@ -183,6 +191,47 @@ public class Constants : MonoBehaviour
                         if (distanceToTarget < closestDistance)
                         {
                             closestDistance = distanceToTarget;
+                            bestTarget = hit.transform;
+                        }
+                    }
+                }
+            }
+        }
+
+        return bestTarget;
+    }
+
+    public static Transform FindWeakestTarget(Transform searcherTransform, int searcherTeam, float radius, bool targetEnemies = true, bool targetAllies = false)
+    {
+        Collider[] hitColliders = Physics.OverlapSphere(searcherTransform.position, radius);
+        Transform bestTarget = null;
+        float weakestPercent = 1.0f;
+
+        foreach (Collider hit in hitColliders)
+        {
+            if (hit is CapsuleCollider)
+            {
+                if (hit.transform == searcherTransform) continue;
+
+                int targetTeam = -1;
+
+                EntityHandler eHandler = hit.GetComponent<EntityHandler>();
+                if (eHandler != null)
+                {
+                    targetTeam = eHandler.EntityTeam;
+                }
+
+                if (targetTeam != -1)
+                {
+                    bool isAlly = (targetTeam == searcherTeam);
+                    bool isEnemy = !isAlly;
+
+                    if ((targetEnemies && isEnemy) || (targetAllies && isAlly))
+                    {
+                        float targetHPPercent = eHandler.GetHPPercent();
+                        if (targetHPPercent < weakestPercent)
+                        {
+                            weakestPercent = targetHPPercent;
                             bestTarget = hit.transform;
                         }
                     }

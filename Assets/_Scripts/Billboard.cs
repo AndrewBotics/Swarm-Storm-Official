@@ -6,7 +6,7 @@ public class Billboard : MonoBehaviour
 
     void Start()
     {
-        MainCamera = Camera.main; 
+        MainCamera = Constants.MainCamera; 
     }
 
     void LateUpdate()

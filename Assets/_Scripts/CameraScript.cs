@@ -4,7 +4,9 @@ public class CameraScript : MonoBehaviour
 {
     private Transform playerTarget;
     private Vector3 offset = new Vector3(0f, 8f, 4f);
-    private float smoothSpeed = 5f;
+    
+    private Vector3 currentVelocity;
+    private float smoothTime = 0.15f; 
 
     public void SetTarget(Transform target)
     {
@@ -13,12 +15,10 @@ public class CameraScript : MonoBehaviour
 
     void LateUpdate()
     {
-        if (playerTarget == null) 
-        {
-            return; 
-        }
+        if (playerTarget == null) return; 
         
         Vector3 desiredPosition = playerTarget.position + offset;
-        transform.position = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed * Time.deltaTime);
+        
+        transform.position = Vector3.SmoothDamp(transform.position, desiredPosition, ref currentVelocity, smoothTime);
     }
 }

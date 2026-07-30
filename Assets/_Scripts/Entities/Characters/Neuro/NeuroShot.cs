@@ -9,13 +9,15 @@ public class NeuroShot : ProjectileHandler
 
     private int generation;
     private Vector3 targetPosition;
+    private int currentSeed;
 
-    public void Setup(Vector3 vectorData, int team, float d, float s, float mD, float oD, int currentGeneration)
+    public void Setup(Vector3 vectorData, int team, float d, float s, float mD, float oD, int currentGeneration, int seed)
     {
         base.Setup(team, d, s, mD);
         
         generation = currentGeneration;
         overshootDistance = oD;
+        currentSeed = seed;
 
         if (generation > 0)
         {
@@ -78,8 +80,9 @@ public class NeuroShot : ProjectileHandler
             
             if (target != null)
             {
-                if (generation - 1 > 0)
+                if (generation > 1)
                 {
+                    Random.InitState(currentSeed+generation);
                     Vector3 randomOffset = new Vector3(Random.Range(-randDist, randDist), 0, Random.Range(-randDist, randDist));
                     Vector3 randomTargetPoint = target.position + randomOffset;
                     
@@ -103,7 +106,7 @@ public class NeuroShot : ProjectileHandler
                 
                 if (logic != null)
                 {
-                    logic.Setup(nextVectorData, projectileTeam, damage, speed, maxDistance, overshootDistance, generation - 1);
+                    logic.Setup(nextVectorData, projectileTeam, damage, speed, maxDistance, overshootDistance, generation - 1, currentSeed);
                 }
 
                 if (base.IsServerInitialized)

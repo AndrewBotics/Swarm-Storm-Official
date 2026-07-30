@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &3626422724707711963
+--- !u!1 &3828095946296479489
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,8 +8,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 5052004150074753329}
-  - component: {fileID: 3377590853079297887}
+  - component: {fileID: 2710152059697305291}
+  - component: {fileID: 4692407184518348060}
+  - component: {fileID: 5208874619342151506}
   m_Layer: 0
   m_Name: Constants
   m_TagString: Untagged
@@ -17,34 +18,97 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &5052004150074753329
+--- !u!4 &2710152059697305291
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3626422724707711963}
+  m_GameObject: {fileID: 3828095946296479489}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 27.03557, y: 1.14668, z: 3.85831}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3377590853079297887
+--- !u!114 &4692407184518348060
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3626422724707711963}
+  m_GameObject: {fileID: 3828095946296479489}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1ffde871260961b42acd5af3d430b865, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Constants
+  _componentIndexCache: 0
+  _addedNetworkObject: {fileID: 5208874619342151506}
+  _networkObjectCache: {fileID: 5208874619342151506}
   topNlingPrefab: {fileID: 9141773902364309507, guid: d825f121ce5d6e54e810ee9a2e0e9dfa, type: 3}
   junNlingPrefab: {fileID: 9141773902364309507, guid: d825f121ce5d6e54e810ee9a2e0e9dfa, type: 3}
   botNlingPrefab: {fileID: 9141773902364309507, guid: d825f121ce5d6e54e810ee9a2e0e9dfa, type: 3}
-  teamTowerPrefab: {fileID: 9141773902364309507, guid: d825f121ce5d6e54e810ee9a2e0e9dfa, type: 3}
+  tower1Prefab: {fileID: 2415006967326273247, guid: 31b680291feafbb4691a6fcd6ae1eca9, type: 3}
+  tower2Prefab: {fileID: 2415006967326273247, guid: 31b680291feafbb4691a6fcd6ae1eca9, type: 3}
+  eyePrefab: {fileID: 2415006967326273247, guid: 31b680291feafbb4691a6fcd6ae1eca9, type: 3}
+--- !u!114 &5208874619342151506
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3828095946296479489}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26b716c41e9b56b4baafaf13a523ba2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FishNet.Runtime::FishNet.Object.NetworkObject
+  <IsNested>k__BackingField: 0
+  WasActiveDuringEdit: 0
+  WasActiveDuringEdit_Set1: 1
+  <ComponentIndex>k__BackingField: 0
+  <PredictedSpawn>k__BackingField: {fileID: 0}
+  <PredictedOwner>k__BackingField: {fileID: 0}
+  NetworkBehaviours:
+  - {fileID: 4692407184518348060}
+  InitializedParentNetworkBehaviour: {fileID: 0}
+  InitializedNestedNetworkObjects: []
+  RuntimeParentNetworkBehaviour: {fileID: 0}
+  RuntimeChildNetworkBehaviours: []
+  _isNetworked: 1
+  _isSpawnable: 1
+  _isGlobal: 0
+  _initializeOrder: 0
+  _preventDespawnOnDisconnect: 0
+  _defaultDespawnType: 0
+  _initializedTimestamp: -8584161798451571718
+  _localLevelOfDetailCalculationType: 0
+  _useLevelOfDetail: 0
+  _useRootLevelOfDetail: 1
+  NetworkObserver: {fileID: 0}
+  _enablePrediction: 0
+  _predictionType: 0
+  _localReconcileCorrectionType: 2
+  _graphicalObject: {fileID: 0}
+  _detachGraphicalObject: 0
+  _enableStateForwarding: 1
+  _networkTransform: {fileID: 0}
+  _ownerInterpolation: 1
+  _ownerSmoothedProperties: 255
+  _adaptiveInterpolation: 3
+  _spectatorSmoothedProperties: 255
+  _spectatorInterpolation: 2
+  _enableTeleport: 0
+  _teleportThreshold: 1
+  <PrefabId>k__BackingField: 18
+  <SpawnableCollectionId>k__BackingField: 0
+  <AssetPathHash>k__BackingField: 17035790457699534527
+  SceneId: 0
+  SerializedTransformProperties:
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0, w: 1}
+    Scale: {x: 1, y: 1, z: 1}
+    IsValid: 1

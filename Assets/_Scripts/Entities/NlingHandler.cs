@@ -21,11 +21,11 @@ public abstract class NlingHandler : EntityHandler
 
     public override void TakeDamage(float amount, int attackerTeam)
     {
-        if (EntityCurrentHP <= 0) return;
+        if (GetHPValue() <= 0) return;
 
         base.TakeDamage(amount, attackerTeam);
 
-        if (EntityCurrentHP <= 0)
+        if (GetHPValue() <= 0)
         {
             if (EntityTeam==Constants.WILD) ConvertToTeam(attackerTeam);
             else Die();
@@ -37,25 +37,15 @@ public abstract class NlingHandler : EntityHandler
         Destroy(gameObject);
     }
 
-    protected override IEnumerator KnockbackRoutine(Vector3 dir, float dist, float dur)
+    public override void ApplyKnockback(Vector3 direction, float distance, float duration)
     {
-        float timer = 0f;
-        float speed = dist / dur;
-        while (timer < dur)
-        {
-            if (NlingAgent != null && NlingAgent.isActiveAndEnabled)
-            {
-                NlingAgent.Move(dir * speed * Time.deltaTime);
-            }
-            timer += Time.deltaTime;
-            yield return null;
-        }
+        base.ApplyKnockback(direction, distance*0.5f, duration);
     }
 
     protected void ConvertToTeam(int newTeam)
     {
         EntityTeam = newTeam;
-        EntityCurrentHP = EntityMaxHP;
+        SetHPValue(EntityMaxHP);
         SetHP(1.0f);
 
         UpdateTargetBase();

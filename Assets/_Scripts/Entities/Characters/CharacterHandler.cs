@@ -19,9 +19,6 @@ public abstract class CharacterHandler : EntityHandler
     protected float RespawnTime;
     [HideInInspector] public bool isDead = false;
     
-    // player assignment is not implemented, so I will assume the only character on the map is the player
-    public bool isPlayer = true;
-
     public override void OnStartClient()
     {
         base.OnStartClient();
@@ -32,7 +29,7 @@ public abstract class CharacterHandler : EntityHandler
             Attack2Joy = Constants.Attack2Joy;
             UltJoy = Constants.UltJoy;
 
-            CameraScript camScript = Camera.main.GetComponent<CameraScript>();
+            CameraScript camScript = Constants.MainCamera.GetComponent<CameraScript>();
             if (camScript != null)
             {
                 camScript.SetTarget(this.transform);
@@ -44,6 +41,27 @@ public abstract class CharacterHandler : EntityHandler
         }
     }
 
+    public override void OnStartNetwork()
+    {
+        base.OnStartNetwork();
+        
+        if (base.IsServerInitialized || base.Owner.IsLocalClient)
+        {
+            base.TimeManager.OnTick += TimeManager_OnTick;
+            base.TimeManager.OnPostTick += TimeManager_OnPostTick;
+        }
+    }
+
+    public override void OnStopNetwork()
+    {
+        base.OnStopNetwork();
+        if (base.TimeManager != null)
+        {
+            base.TimeManager.OnTick -= TimeManager_OnTick;
+            base.TimeManager.OnPostTick -= TimeManager_OnPostTick;
+        }
+    }
+
     protected override void Update()
     {
         if (isDead)
@@ -52,16 +70,32 @@ public abstract class CharacterHandler : EntityHandler
             return;
         }
 
+        if (EntityAnimator != null && base.IsOwner)
+        {
+            EntityAnimator.SetFloat("Speed", MoveJoy.GetJoystickVector().magnitude);
+        }
+        base.Update();
+    }
+
+    private void TimeManager_OnTick()
+    {
+        if (isDead) return;
+
+        if (knockbackTimer > 0)
+        {
+            knockbackTimer -= (float) base.TimeManager.TickDelta;
+        }
+
         if (base.IsOwner)
         {
             Vector2 input = MoveJoy.GetJoystickVector();
             Vector3 finalMoveDir = Vector3.zero;
 
-            if (input != Vector2.zero)
+            if (knockbackTimer <= 0 && input != Vector2.zero)
             {
-                Vector3 camForward = Camera.main.transform.forward;
+                Vector3 camForward = Constants.MainCamera.transform.forward;
                 camForward.y = 0f;
-                Vector3 camRight = Camera.main.transform.right;
+                Vector3 camRight = Constants.MainCamera.transform.right;
                 camRight.y = 0f;
 
                 finalMoveDir = (camForward.normalized * input.y + camRight.normalized * input.x).normalized;
@@ -72,17 +106,17 @@ public abstract class CharacterHandler : EntityHandler
             md.MoveDirection = finalMoveDir;
             MoveCharacter(md);
         }
-
-        if (EntityAnimator != null && base.IsOwner)
-        {
-            EntityAnimator.SetFloat("Speed", MoveJoy.GetJoystickVector().magnitude);
-        }
-        base.Update();
     }
 
     [Replicate]
     private void MoveCharacter(MoveData md, ReplicateState state = ReplicateState.Invalid, Channel channel = Channel.Unreliable)
     {
+        if (knockbackTimer > 0)
+        {
+            CharController.Move(currentKnockbackVelocity * (float) base.TimeManager.TickDelta);
+            return;
+        }
+
         if (md.MoveDirection != Vector3.zero)
         {
             Vector3 scaledMovement = md.MoveDirection * GetSpeedValue() * (float)base.TimeManager.TickDelta;
@@ -94,27 +128,9 @@ public abstract class CharacterHandler : EntityHandler
         }
     }
 
-    public override void OnStartNetwork()
-    {
-        base.OnStartNetwork();
-        if (base.IsServerInitialized)
-        {
-            base.TimeManager.OnPostTick += TimeManager_OnPostTick;
-        }
-    }
-
-    public override void OnStopNetwork()
-    {
-        base.OnStopNetwork();
-        if (base.TimeManager != null)
-        {
-            base.TimeManager.OnPostTick -= TimeManager_OnPostTick;
-        }
-    }
-
     private void TimeManager_OnPostTick()
     {
-        CreateReconcile();
+        if (base.IsServerInitialized) CreateReconcile();
     }
 
     public override void CreateReconcile()
@@ -139,7 +155,7 @@ public abstract class CharacterHandler : EntityHandler
 
         base.TakeDamage(amount, attackerTeam);
         
-        if (EntityCurrentHP <= 0) Die();
+        if (GetHPValue() <= 0) Die();
     }
 
     protected override void Die()
@@ -170,21 +186,6 @@ public abstract class CharacterHandler : EntityHandler
         Debug.Log(EntityName + " died!");
     }
 
-    protected override IEnumerator KnockbackRoutine(Vector3 dir, float dist, float dur)
-    {
-        float timer = 0f;
-        float speed = dist / dur;
-        while (timer < dur)
-        {
-            if (CharController != null && CharController.enabled)
-            {
-                CharController.Move(dir * speed * Time.deltaTime);
-            }
-            timer += Time.deltaTime;
-            yield return null;
-        }
-    }
-
     public void Respawn()
     {
         isDead = false;
@@ -213,7 +214,7 @@ public abstract class CharacterHandler : EntityHandler
         CharController.enabled = true;
 
 
-        EntityCurrentHP = EntityMaxHP;
+        SetHPValue(EntityMaxHP);
         SetHP(1.0f);
         Attack1Joy.RemoveCooldown();
         Attack2Joy.RemoveCooldown();
