@@ -418,7 +418,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3227914233660411679}
-  - component: {fileID: 5336319693155376108}
   - component: {fileID: 1449140091338866135}
   - component: {fileID: 1144878448154258186}
   - component: {fileID: 747210580946607497}
@@ -450,27 +449,6 @@ Transform:
   - {fileID: 1368082770755086383}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5336319693155376108
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5076783700601204841}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 95b41a37157023c46bf828a2e83a45fb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TempestHandler
-  _componentIndexCache: 0
-  _addedNetworkObject: {fileID: 1449140091338866135}
-  _networkObjectCache: {fileID: 1449140091338866135}
-  EntityAnimator: {fileID: 0}
-  EntityHPBar: {fileID: 5572119604381276361}
-  EntityName: 
-  EntityTeam: 0
-  projectilePrefab: {fileID: 7889089988276623983, guid: 42b2da76bf694d24b849d50e05dbac2f, type: 3}
-  firePoint: {fileID: 8346136232045927090}
 --- !u!114 &1449140091338866135
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -490,8 +468,9 @@ MonoBehaviour:
   <PredictedSpawn>k__BackingField: {fileID: 0}
   <PredictedOwner>k__BackingField: {fileID: 0}
   NetworkBehaviours:
-  - {fileID: 5336319693155376108}
+  - {fileID: 0}
   - {fileID: 1144878448154258186}
+  - {fileID: 1561813639870329087}
   InitializedParentNetworkBehaviour: {fileID: 0}
   InitializedNestedNetworkObjects: []
   RuntimeParentNetworkBehaviour: {fileID: 0}
@@ -502,7 +481,7 @@ MonoBehaviour:
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 0
-  _initializedTimestamp: -8584161581644929694
+  _initializedTimestamp: -8584160976333563456
   _localLevelOfDetailCalculationType: 0
   _useLevelOfDetail: 0
   _useRootLevelOfDetail: 1
@@ -521,12 +500,12 @@ MonoBehaviour:
   _spectatorInterpolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
-  <PrefabId>k__BackingField: 9
+  <PrefabId>k__BackingField: 15
   <SpawnableCollectionId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 10872160054654239901
   SceneId: 0
   SerializedTransformProperties:
-    Position: {x: 3.74045, y: -0, z: -12.73777}
+    Position: {x: -9.20652, y: 0, z: 10.70433}
     Rotation: {x: 0, y: 0, z: 0, w: 1}
     Scale: {x: 1, y: 1, z: 1}
     IsValid: 1
@@ -609,9 +588,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3b1e1445f47ddf4e973e4d7fbe70321, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Tower2Handler
-  _componentIndexCache: 255
+  _componentIndexCache: 2
   _addedNetworkObject: {fileID: 1449140091338866135}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 1449140091338866135}
   EntityAnimator: {fileID: 0}
   EntityHPBar: {fileID: 5572119604381276361}
   EntityName: 

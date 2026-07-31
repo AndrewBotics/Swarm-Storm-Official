@@ -10,9 +10,9 @@ public class NeuroBeam : ProjectileHandler
     
     private ParticleSystem beamParticles;
 
-    public void Setup(int team, float totalDamage, float duration, int ticks, float width, float range, Transform caster)
+    public void Setup(NeuroHandler neuro, float totalDamage, float duration, int ticks, float width, float range, Transform caster)
     {
-        base.Setup(team, totalDamage / ticks, 0f, range);
+        base.Setup(neuro, totalDamage / ticks, 0f, range);
         
         tickRate = duration / ticks;
         extents = new Vector3(width / 2f, 2f, range / 2f);
@@ -67,7 +67,7 @@ public class NeuroBeam : ProjectileHandler
                 {
                     if (eHandler.EntityTeam != -1 && eHandler.EntityTeam != projectileTeam)
                     {
-                        eHandler.TakeDamage(damage, projectileTeam);
+                        eHandler.TakeDamage(damage, shooter);
                     }
                 }
             }

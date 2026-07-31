@@ -31,14 +31,14 @@ public abstract class StructureHandler : EntityHandler
         // if enemies exist, attack the weakest close one.
         // else if friendlies exist, heal the weakest close one.
         if (Time.time < nextAttackTime) return;
-        Transform target = Constants.FindClosestTarget(transform, EntityTeam, StructureAttackRadius);
+        Transform target = Constants.FindClosestTarget(transform, EntityTeam, StructureAttackRadius, targetWild: false);
 
         if (target != null)
         {
             FireProjectile(target, GetAttackValue(StructureAttackDamage));
         }
         else {
-            target = Constants.FindClosestTarget(transform, EntityTeam, StructureAttackRadius, false, true);
+            target = Constants.FindClosestTarget(transform, EntityTeam, StructureAttackRadius, targetEnemies: false, targetAllies: true, requireMissingHP: true);
             if (target != null)
             {
                 FireProjectile(target, StructureAttackDamage);
@@ -53,16 +53,21 @@ public abstract class StructureHandler : EntityHandler
         HomingProjectileHandler homingLogic = proj.GetComponent<HomingProjectileHandler>();
         if (homingLogic != null)
         {
-            homingLogic.Setup(EntityTeam, target, damage, StructureAttackVelocity);
+            homingLogic.Setup(this, target, damage, StructureAttackVelocity);
         }
         base.ServerManager.Spawn(proj);
     }
 
-    public override void TakeDamage(float amount, int attackerTeam)
+    public override void TakeDamage(float amount, EntityHandler attacker)
     {
         if (GetHPValue() <= 0) return;
 
-        base.TakeDamage(amount, attackerTeam);
+        if (attacker != null && attacker is NlingHandler)
+        {
+            amount *= 2.0f;
+        }
+
+        base.TakeDamage(amount, attacker);
 
         if (GetHPValue() <= 0)
         {

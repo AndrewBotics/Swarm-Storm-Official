@@ -149,11 +149,11 @@ public abstract class CharacterHandler : EntityHandler
         transform.rotation = rd.Rotation;
     }
 
-    public override void TakeDamage(float amount, int attackerTeam)
+    public override void TakeDamage(float amount, EntityHandler attacker)
     {
         if (isDead) return;
 
-        base.TakeDamage(amount, attackerTeam);
+        base.TakeDamage(amount, attacker);
         
         if (GetHPValue() <= 0) Die();
     }

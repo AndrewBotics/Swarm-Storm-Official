@@ -11,9 +11,9 @@ public class NeuroShot : ProjectileHandler
     private Vector3 targetPosition;
     private int currentSeed;
 
-    public void Setup(Vector3 vectorData, int team, float d, float s, float mD, float oD, int currentGeneration, int seed)
+    public void Setup(EntityHandler neuro, Vector3 vectorData, float d, float s, float mD, float oD, int currentGeneration, int seed)
     {
-        base.Setup(team, d, s, mD);
+        base.Setup(neuro, d, s, mD);
         
         generation = currentGeneration;
         overshootDistance = oD;
@@ -106,7 +106,7 @@ public class NeuroShot : ProjectileHandler
                 
                 if (logic != null)
                 {
-                    logic.Setup(nextVectorData, projectileTeam, damage, speed, maxDistance, overshootDistance, generation - 1, currentSeed);
+                    logic.Setup(shooter, nextVectorData, damage, speed, maxDistance, overshootDistance, generation - 1, currentSeed);
                 }
 
                 if (base.IsServerInitialized)
@@ -130,8 +130,7 @@ public class NeuroShot : ProjectileHandler
         {
             if (entity.EntityTeam != -1 && entity.EntityTeam != projectileTeam)
             {
-                entity.TakeDamage(damage, projectileTeam);
-                // Debug.Log("Attacked " + entity.EntityName);
+                entity.TakeDamage(damage, shooter);
                 OnHit(entity);
                 // Debug.Log(entity.EntityName+": "+entity.GetHPValue());
             }

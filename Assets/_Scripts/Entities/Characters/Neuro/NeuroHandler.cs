@@ -140,7 +140,7 @@ public class NeuroHandler : CharacterHandler
 
         if (holdTime <= JoystickHandler.autoAimTime) 
         {
-            Transform target = Constants.FindClosestTarget(transform, EntityTeam, 10f, true, false);
+            Transform target = Constants.FindWeakestTarget(transform, EntityTeam, 10f);
             if (target != null)
             {
                 aimDirection = (target.position - transform.position).normalized;
@@ -194,7 +194,7 @@ public class NeuroHandler : CharacterHandler
             NeuroShot logic = proj.GetComponent<NeuroShot>();
             if (logic != null)
             {
-                logic.Setup(endPos, EntityTeam, damage, NeuroAttack1Speed, NeuroAttack1Range2, NeuroAttack1Overshoot, 1, seed);
+                logic.Setup(this, endPos, damage, NeuroAttack1Speed, NeuroAttack1Range2, NeuroAttack1Overshoot, 1, seed);
             }
             
             base.ServerManager.Spawn(proj);
@@ -210,7 +210,7 @@ public class NeuroHandler : CharacterHandler
 
         if (holdTime <= JoystickHandler.autoAimTime) 
         {
-            Transform target = Constants.FindClosestTarget(transform, EntityTeam, 10f);
+            Transform target = Constants.FindWeakestTarget(transform, EntityTeam, 10f);
             if (target != null)
             {
                 aimDirection = (target.position - transform.position).normalized;
@@ -244,7 +244,7 @@ public class NeuroHandler : CharacterHandler
             NeuroBeam logic = beamObj.GetComponent<NeuroBeam>();
             if (logic != null)
             {
-                logic.Setup(EntityTeam, GetAttackValue(NeuroAttack2BaseDamage), NeuroAttack2Duration, NeuroAttack2Ticks, NeuroAttack2Width, NeuroAttack2Range, transform);
+                logic.Setup(this, GetAttackValue(NeuroAttack2BaseDamage), NeuroAttack2Duration, NeuroAttack2Ticks, NeuroAttack2Width, NeuroAttack2Range, transform);
             }
             
             base.ServerManager.Spawn(beamObj);
@@ -260,7 +260,7 @@ public class NeuroHandler : CharacterHandler
 
         if (holdTime <= JoystickHandler.autoAimTime) 
         {
-            Transform target = Constants.FindClosestTarget(transform, EntityTeam, 10f);
+            Transform target = Constants.FindWeakestTarget(transform, EntityTeam, 10f);
             if (target != null)
             {
                 aimDirection = (target.position - transform.position).normalized;
@@ -300,7 +300,7 @@ public class NeuroHandler : CharacterHandler
             NeuroShot logic = proj.GetComponent<NeuroShot>();
             if (logic != null)
             {
-                logic.Setup(endPos, EntityTeam, GetAttackValue(NeuroUltBaseDamage), NeuroUltSpeed, NeuroUltRange2, NeuroUltOvershoot, NeuroUltCount, seed);
+                logic.Setup(this, endPos, GetAttackValue(NeuroUltBaseDamage), NeuroUltSpeed, NeuroUltRange2, NeuroUltOvershoot, NeuroUltCount, seed);
             }
             
             base.ServerManager.Spawn(proj);

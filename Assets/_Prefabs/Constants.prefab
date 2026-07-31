@@ -48,9 +48,9 @@ MonoBehaviour:
   _componentIndexCache: 0
   _addedNetworkObject: {fileID: 5208874619342151506}
   _networkObjectCache: {fileID: 5208874619342151506}
-  topNlingPrefab: {fileID: 9141773902364309507, guid: d825f121ce5d6e54e810ee9a2e0e9dfa, type: 3}
-  junNlingPrefab: {fileID: 9141773902364309507, guid: d825f121ce5d6e54e810ee9a2e0e9dfa, type: 3}
-  botNlingPrefab: {fileID: 9141773902364309507, guid: d825f121ce5d6e54e810ee9a2e0e9dfa, type: 3}
+  topNlingPrefab: {fileID: 4387117286906483107, guid: a0e8b2f18dc3cc54aa62efd59783ef0e, type: 3}
+  junNlingPrefab: {fileID: 4213576537085068373, guid: 96813eed6c2e9a44aaa25a9f7882b0d3, type: 3}
+  botNlingPrefab: {fileID: 8694384745597824829, guid: be4e13cafdd8a2b498b059e006f4faea, type: 3}
   tower1Prefab: {fileID: 8767164840714394452, guid: 8816e6b51b2b5294c96c27ac0b16c262, type: 3}
   tower2Prefab: {fileID: 5076783700601204841, guid: c6460443504b02b4c83ce5a34ee11f52, type: 3}
   eyePrefab: {fileID: 2415006967326273247, guid: 31b680291feafbb4691a6fcd6ae1eca9, type: 3}

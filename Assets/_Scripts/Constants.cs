@@ -160,28 +160,36 @@ public class Constants : NetworkBehaviour
         respawningPositions.Remove(pos);
     }
 
-    public static Transform FindClosestTarget(Transform searcherTransform, int searcherTeam, float radius, bool targetEnemies = true, bool targetAllies = false)
+    private static Collider[] targetColliders = new Collider[50];
+
+    public static Transform FindClosestTarget(Transform searcherTransform, int searcherTeam, float radius, bool targetEnemies = true, bool targetAllies = false, bool requireMissingHP = false, bool targetWild = true)
     {
-        Collider[] hitColliders = Physics.OverlapSphere(searcherTransform.position, radius);
+        int count = Physics.OverlapSphereNonAlloc(searcherTransform.position, radius, targetColliders);
         Transform bestTarget = null;
         float closestDistance = Mathf.Infinity;
 
-        foreach (Collider hit in hitColliders)
+        for (int i = 0; i < count; i++)
         {
+            Collider hit = targetColliders[i];
+            
             EntityHandler eHandler = hit.GetComponentInParent<EntityHandler>();
-            if (eHandler==null) continue;
-            if (eHandler.gameObject==searcherTransform.gameObject) continue;
-            if (hit.GetComponentInParent<ProjectileHandler>()!=null) continue;
+            if (eHandler == null) continue;
+            if (eHandler.gameObject == searcherTransform.gameObject) continue;
+            if (hit.GetComponentInParent<ProjectileHandler>() != null) continue;
 
             int targetTeam = eHandler.EntityTeam;
 
             if (targetTeam != -1)
             {
+                if (!targetWild && targetTeam == WILD) continue;
+
                 bool isAlly = (targetTeam == searcherTeam);
                 bool isEnemy = !isAlly;
 
                 if ((targetEnemies && isEnemy) || (targetAllies && isAlly))
                 {
+                    if (requireMissingHP && eHandler.GetHPPercent() >= 1.0f) continue;
+
                     float distanceToTarget = Vector3.Distance(searcherTransform.position, hit.transform.position);
                     if (distanceToTarget < closestDistance)
                     {
@@ -195,32 +203,40 @@ public class Constants : NetworkBehaviour
         return bestTarget;
     }
 
-    public static Transform FindWeakestTarget(Transform searcherTransform, int searcherTeam, float radius, bool targetEnemies = true, bool targetAllies = false)
+    public static Transform FindWeakestTarget(Transform searcherTransform, int searcherTeam, float radius, bool targetEnemies = true, bool targetAllies = false, bool requireMissingHP = false, bool targetWild = true)
     {
-        Collider[] hitColliders = Physics.OverlapSphere(searcherTransform.position, radius);
+        int count = Physics.OverlapSphereNonAlloc(searcherTransform.position, radius, targetColliders);
         Transform bestTarget = null;
-        float weakestPercent = 1.0f;
+        
+        float weakestPercent = 1.01f; 
 
-        foreach (Collider hit in hitColliders)
+        for (int i = 0; i < count; i++)
         {
+            Collider hit = targetColliders[i];
+            
             EntityHandler eHandler = hit.GetComponentInParent<EntityHandler>();
-            if (eHandler==null) continue;
-            if (eHandler.gameObject==searcherTransform.gameObject) continue;
-            if (hit.GetComponentInParent<ProjectileHandler>()!=null) continue;
+            if (eHandler == null) continue;
+            if (eHandler.gameObject == searcherTransform.gameObject) continue;
+            if (hit.GetComponentInParent<ProjectileHandler>() != null) continue;
             
             int targetTeam = eHandler.EntityTeam;
 
             if (targetTeam != -1)
             {
+                if (!targetWild && targetTeam == WILD) continue;
+
                 bool isAlly = (targetTeam == searcherTeam);
                 bool isEnemy = !isAlly;
 
                 if ((targetEnemies && isEnemy) || (targetAllies && isAlly))
                 {
-                    float targetHPPercent = eHandler.GetHPPercent();
-                    if (targetHPPercent < weakestPercent)
+                    float hpPercent = eHandler.GetHPPercent();
+                    
+                    if (requireMissingHP && hpPercent >= 1.0f) continue;
+
+                    if (hpPercent < weakestPercent)
                     {
-                        weakestPercent = targetHPPercent;
+                        weakestPercent = hpPercent;
                         bestTarget = hit.transform;
                     }
                 }
@@ -228,5 +244,52 @@ public class Constants : NetworkBehaviour
         }
 
         return bestTarget;
+    }
+
+    public static Transform FindNextLaneTarget(Transform searcherTransform, int searcherTeam)
+    {
+        Vector3[] enemyPositions;
+        if (searcherTeam == TEAM1) enemyPositions = CRIMPOS;
+        else if (searcherTeam == TEAM2) enemyPositions = TEALPOS;
+        else return null;
+
+        bool isTopLane = searcherTransform.position.z < 0;
+
+        // these magic numbers come from CRIMPOS and TEALPOS
+        // Index 0: Eye
+        // Index 1: Top Inner Tower (Tower 2)
+        // Index 2: Top Outer Tower (Tower 1)
+        // Index 3: Bot Inner Tower (Tower 2)
+        // Index 4: Bot Outer Tower (Tower 1)
+        
+        int outerTowerIndex = isTopLane ? 2 : 4;
+        int innerTowerIndex = isTopLane ? 1 : 3;
+        int eyeIndex = 0;
+        
+        // Check outer tower
+        Transform target = GetAliveStructureAt(enemyPositions[outerTowerIndex], searcherTeam);
+        if (target != null) return target;
+
+        // Check inner tower if outer is deadge
+        target = GetAliveStructureAt(enemyPositions[innerTowerIndex], searcherTeam);
+        if (target != null) return target;
+
+        // Default to Eye if both towers in a lane are deadge
+        return GetAliveStructureAt(enemyPositions[eyeIndex], searcherTeam);
+    }
+
+    private static Transform GetAliveStructureAt(Vector3 position, int searcherTeam)
+    {
+        int count = Physics.OverlapSphereNonAlloc(position, 1.0f, targetColliders);
+        
+        for (int i = 0; i < count; i++)
+        {
+            StructureHandler structure = targetColliders[i].GetComponentInParent<StructureHandler>();
+            if (structure != null && structure.EntityTeam != searcherTeam && structure.GetHPValue() > 0)
+            {
+                return structure.transform;
+            }
+        }
+        return null;
     }
 }

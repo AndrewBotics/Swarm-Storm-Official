@@ -111,12 +111,11 @@ public abstract class EntityHandler : NetworkBehaviour
         SetHP(currentHP/maxHP);
     }
 
-    public virtual void TakeDamage(float amount, int attackerTeam)
+    public virtual void TakeDamage(float amount, EntityHandler attacker)
     {
-        ChangeHPValue(-amount/GetDefenseValue()); 
+        ChangeHPValue(-amount / GetDefenseValue()); 
         
-        SetHP(GetHPValue()/EntityMaxHP);
-        //Debug.Log(EntityName +" took "+amount+" damage!");
+        SetHP(GetHPValue() / EntityMaxHP);
     }
 
     public virtual void Heal(float amount)

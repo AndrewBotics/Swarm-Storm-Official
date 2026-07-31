@@ -7,10 +7,12 @@ public abstract class ProjectileHandler : NetworkBehaviour
     protected float speed;
     protected float maxDistance;
     protected Vector3 startPosition;
+    [HideInInspector] public EntityHandler shooter;
 
-    public virtual void Setup(int team, float dmg, float spd, float maxDist)
+    public virtual void Setup(EntityHandler ent, float dmg, float spd, float maxDist)
     {
-        projectileTeam = team;
+        shooter = ent;
+        projectileTeam = ent.EntityTeam;
         damage = dmg;
         speed = spd;
         maxDistance = maxDist;
@@ -58,7 +60,7 @@ public abstract class ProjectileHandler : NetworkBehaviour
         {
             if (entity.EntityTeam != -1 && entity.EntityTeam != projectileTeam)
             {
-                entity.TakeDamage(damage, projectileTeam);
+                entity.TakeDamage(damage, shooter);
                 OnHit(entity);
                 DestroyProjectile();
             }

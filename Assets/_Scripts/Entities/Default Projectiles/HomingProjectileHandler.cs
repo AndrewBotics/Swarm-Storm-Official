@@ -13,9 +13,10 @@ public class HomingProjectileHandler : ProjectileHandler
         
     }
 
-    public void Setup(int team, Transform newTarget, float dmg, float spd)
+    public void Setup(EntityHandler ent, Transform newTarget, float dmg, float spd)
     {
-        projectileTeam = team;
+        shooter = ent;
+        projectileTeam = ent.EntityTeam;
         target = newTarget;
         damage = dmg;
         speed = spd;
@@ -77,7 +78,7 @@ public class HomingProjectileHandler : ProjectileHandler
         {
             if (entity.EntityTeam != -1 && entity.EntityTeam != projectileTeam)
             {
-                entity.TakeDamage(damage, projectileTeam);
+                entity.TakeDamage(damage, shooter);
                 OnHit(entity);
                 DestroyProjectile();
             }
