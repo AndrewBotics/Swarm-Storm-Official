@@ -1,5 +1,6 @@
 using UnityEngine;
 using FishNet.Object;
+
 public abstract class ProjectileHandler : NetworkBehaviour
 {
     [HideInInspector] public int projectileTeam;
@@ -31,16 +32,30 @@ public abstract class ProjectileHandler : NetworkBehaviour
         }
     }
 
-    protected virtual void Update()
+    public override void OnStartServer()
     {
-        if (!base.IsServerInitialized) return;
+        base.OnStartServer();
+        base.TimeManager.OnTick += TimeManager_OnTick;
+    }
+
+    public override void OnStopServer()
+    {
+        base.OnStopServer();
+        if (base.TimeManager != null)
+        {
+            base.TimeManager.OnTick -= TimeManager_OnTick;
+        }
+    }
+
+    private void TimeManager_OnTick()
+    {
         MoveProjectile();
         CheckMaxDistance();
     }
 
     protected virtual void MoveProjectile()
     {
-        transform.position += transform.forward * speed * Time.deltaTime;
+        transform.position += transform.forward * speed * (float)base.TimeManager.TickDelta;
     }
 
     protected virtual void CheckMaxDistance()
@@ -67,7 +82,6 @@ public abstract class ProjectileHandler : NetworkBehaviour
         }
     }
 
-    // override to apply unique effects (e.g., slows, stuns, or branching spawns)
     protected virtual void OnHit(EntityHandler target)
     {
     }

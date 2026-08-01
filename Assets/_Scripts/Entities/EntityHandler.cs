@@ -13,6 +13,7 @@ public abstract class EntityHandler : NetworkBehaviour
     protected Telegraph EntityTelegraph;
     protected Vector3 spawnPosition;
     protected Quaternion spawnRotation;
+    [HideInInspector] public virtual Vector3 CenterPoint => new Vector3(transform.position.x, 0.75f, transform.position.z);
 
     // Stats
     [HideInInspector] public string EntityName;
@@ -46,6 +47,16 @@ public abstract class EntityHandler : NetworkBehaviour
     }
 
     public void SetTeam(int team)
+    {
+        EntityTeam = team;
+        if (base.IsServerInitialized) 
+        {
+            ObserversSetTeam(team);
+        }
+    }
+
+    [ObserversRpc(BufferLast = true)]
+    public void ObserversSetTeam(int team)
     {
         EntityTeam = team;
     }

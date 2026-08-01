@@ -140,7 +140,7 @@ public class NeuroHandler : CharacterHandler
 
         if (holdTime <= JoystickHandler.autoAimTime) 
         {
-            Transform target = Constants.FindWeakestTarget(transform, EntityTeam, 10f);
+            Transform target = Constants.FindClosestTarget(transform, EntityTeam, 10f);
             if (target != null)
             {
                 aimDirection = (target.position - transform.position).normalized;
@@ -210,7 +210,7 @@ public class NeuroHandler : CharacterHandler
 
         if (holdTime <= JoystickHandler.autoAimTime) 
         {
-            Transform target = Constants.FindWeakestTarget(transform, EntityTeam, 10f);
+            Transform target = Constants.FindClosestTarget(transform, EntityTeam, 10f);
             if (target != null)
             {
                 aimDirection = (target.position - transform.position).normalized;
@@ -260,7 +260,7 @@ public class NeuroHandler : CharacterHandler
 
         if (holdTime <= JoystickHandler.autoAimTime) 
         {
-            Transform target = Constants.FindWeakestTarget(transform, EntityTeam, 10f);
+            Transform target = Constants.FindClosestTarget(transform, EntityTeam, 10f);
             if (target != null)
             {
                 aimDirection = (target.position - transform.position).normalized;

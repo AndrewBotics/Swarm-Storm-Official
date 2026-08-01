@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 using FishNet.Object;
 
@@ -68,8 +67,12 @@ public class Constants : NetworkBehaviour
     public static Vector3[] CRIMPOS = new Vector3[]{CRIMEYE, CRIMTOWERA, CRIMTOWERB, CRIMTOWERC, CRIMTOWERD};
 
     public static GameObject[] TOWERPREFABS;
-    private HashSet<Vector3> respawningPositions = new HashSet<Vector3>();
     
+    // Server-authoritative respawn tracking
+    private Dictionary<Vector3, uint> respawnTimers = new Dictionary<Vector3, uint>();
+    private Dictionary<Vector3, GameObject> respawnPrefabs = new Dictionary<Vector3, GameObject>();
+    
+    private static Collider[] targetColliders = new Collider[50];
 
     private void Awake()
     {
@@ -84,29 +87,39 @@ public class Constants : NetworkBehaviour
     public override void OnStartServer()
     {
         base.OnStartServer();
+        base.TimeManager.OnTick += TimeManager_OnTick;
+
         foreach (Vector3 pos in TOP){
-            GameObject go = Instantiate(topNlingPrefab, pos, Quaternion.identity);
-            base.ServerManager.Spawn(go);
+            SpawnInitialNling(topNlingPrefab, pos);
         }
 
-        foreach (Vector3 pos in JUN)
-        {
-            GameObject go = Instantiate(junNlingPrefab, pos, Quaternion.identity);
-            base.ServerManager.Spawn(go);
+        foreach (Vector3 pos in JUN){
+            SpawnInitialNling(junNlingPrefab, pos);
         }
         
-        foreach (Vector3 pos in BOT)
-        {
-            GameObject go = Instantiate(botNlingPrefab, pos, Quaternion.identity);
-            base.ServerManager.Spawn(go);
+        foreach (Vector3 pos in BOT){
+            SpawnInitialNling(botNlingPrefab, pos);
         }
-
-        
 
         for (int i = 0; i<5; i++){
             CreateTower(TOWERPREFABS[i], TEALPOS[i], TEAM1);
             CreateTower(TOWERPREFABS[i], CRIMPOS[i], TEAM2);
         }
+    }
+
+    public override void OnStopServer()
+    {
+        base.OnStopServer();
+        if (base.TimeManager != null)
+        {
+            base.TimeManager.OnTick -= TimeManager_OnTick;
+        }
+    }
+
+    private void SpawnInitialNling(GameObject prefab, Vector3 pos)
+    {
+        GameObject go = Instantiate(prefab, pos, Quaternion.identity);
+        base.ServerManager.Spawn(go);
     }
 
     private void CreateTower(GameObject prefab, Vector3 pos, int team)
@@ -117,50 +130,62 @@ public class Constants : NetworkBehaviour
         base.ServerManager.Spawn(go);
     }
 
-    private void Update()
+    private void TimeManager_OnTick()
     {
-        if (!base.IsServerInitialized) return;
-        foreach (Vector3 pos in TOP){
-            Vector3 pos2 = new Vector3(pos.x, 0.75f, pos.z);
-            if (!respawningPositions.Contains(pos) && isEmptyAtVector3(pos2))
+        if (base.TimeManager.Tick % base.TimeManager.TickRate == 0)
+        {
+            CheckLaneRespawns(TOP, topNlingPrefab);
+            CheckLaneRespawns(JUN, junNlingPrefab);
+            CheckLaneRespawns(BOT, botNlingPrefab);
+        }
+
+        ProcessPendingRespawns();
+    }
+
+    private void CheckLaneRespawns(Vector3[] lanePositions, GameObject prefab)
+    {
+        foreach (Vector3 pos in lanePositions)
+        {
+            if (!respawnTimers.ContainsKey(pos))
             {
-                StartCoroutine(RespawnWithDelay(30f, topNlingPrefab, pos));
+                Vector3 checkPos = new Vector3(pos.x, 0.75f, pos.z);
+                if (isEmptyAtVector3(checkPos))
+                {
+                    uint spawnTick = base.TimeManager.Tick + (uint)base.TimeManager.TimeToTicks(30f);
+                    respawnTimers[pos] = spawnTick;
+                    respawnPrefabs[pos] = prefab;
+                }
             }
         }
-        foreach (Vector3 pos in JUN)
+    }
+
+    private void ProcessPendingRespawns()
+    {
+        List<Vector3> toSpawn = new List<Vector3>();
+
+        foreach (var kvp in respawnTimers)
         {
-            Vector3 pos2 = new Vector3(pos.x, 0.75f, pos.z);
-            if (!respawningPositions.Contains(pos) && isEmptyAtVector3(pos2))
+            if (base.TimeManager.Tick >= kvp.Value)
             {
-                StartCoroutine(RespawnWithDelay(30f, junNlingPrefab, pos));
+                toSpawn.Add(kvp.Key);
             }
         }
-        foreach (Vector3 pos in BOT)
+
+        foreach (Vector3 pos in toSpawn)
         {
-            Vector3 pos2 = new Vector3(pos.x, 0.75f, pos.z);
-            if (!respawningPositions.Contains(pos) && isEmptyAtVector3(pos2))
-            {
-                StartCoroutine(RespawnWithDelay(30f, botNlingPrefab, pos));
-            }
+            GameObject go = Instantiate(respawnPrefabs[pos], pos, Quaternion.identity);
+            base.ServerManager.Spawn(go);
+            
+            respawnTimers.Remove(pos);
+            respawnPrefabs.Remove(pos);
         }
     }
 
     private bool isEmptyAtVector3(Vector3 position)
     {
-        Collider[] hitColliders = Physics.OverlapSphere(position, 0.25f);
-        return hitColliders.Length==0;
+        int count = Physics.OverlapSphereNonAlloc(position, 0.25f, targetColliders);
+        return count == 0;
     }
-
-    IEnumerator RespawnWithDelay(float delay, GameObject prefab, Vector3 pos)
-    {
-        respawningPositions.Add(pos);
-        yield return new WaitForSeconds(delay);
-        GameObject go = Instantiate(prefab, pos, Quaternion.identity);
-        base.ServerManager.Spawn(go);
-        respawningPositions.Remove(pos);
-    }
-
-    private static Collider[] targetColliders = new Collider[50];
 
     public static Transform FindClosestTarget(Transform searcherTransform, int searcherTeam, float radius, bool targetEnemies = true, bool targetAllies = false, bool requireMissingHP = false, bool targetWild = true)
     {
@@ -255,26 +280,16 @@ public class Constants : NetworkBehaviour
 
         bool isTopLane = searcherTransform.position.z < 0;
 
-        // these magic numbers come from CRIMPOS and TEALPOS
-        // Index 0: Eye
-        // Index 1: Top Inner Tower (Tower 2)
-        // Index 2: Top Outer Tower (Tower 1)
-        // Index 3: Bot Inner Tower (Tower 2)
-        // Index 4: Bot Outer Tower (Tower 1)
-        
         int outerTowerIndex = isTopLane ? 2 : 4;
         int innerTowerIndex = isTopLane ? 1 : 3;
         int eyeIndex = 0;
         
-        // Check outer tower
         Transform target = GetAliveStructureAt(enemyPositions[outerTowerIndex], searcherTeam);
         if (target != null) return target;
 
-        // Check inner tower if outer is deadge
         target = GetAliveStructureAt(enemyPositions[innerTowerIndex], searcherTeam);
         if (target != null) return target;
 
-        // Default to Eye if both towers in a lane are deadge
         return GetAliveStructureAt(enemyPositions[eyeIndex], searcherTeam);
     }
 

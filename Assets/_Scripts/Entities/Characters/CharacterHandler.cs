@@ -18,6 +18,7 @@ public abstract class CharacterHandler : EntityHandler
     protected float RespawnCooldown = 1.0f;
     protected float RespawnTime;
     [HideInInspector] public bool isDead = false;
+    protected uint respawnTick;
     
     public override void OnStartClient()
     {
@@ -64,11 +65,7 @@ public abstract class CharacterHandler : EntityHandler
 
     protected override void Update()
     {
-        if (isDead)
-        {
-            if (Time.time >= RespawnTime) Respawn();
-            return;
-        }
+        if (isDead) return;
 
         if (EntityAnimator != null && base.IsOwner)
         {
@@ -79,7 +76,14 @@ public abstract class CharacterHandler : EntityHandler
 
     private void TimeManager_OnTick()
     {
-        if (isDead) return;
+        if (isDead)
+        {
+            if (base.IsServerInitialized && base.TimeManager.Tick >= respawnTick)
+            {
+                Respawn();
+            }
+            return;
+        }
 
         if (knockbackTimer > 0)
         {
@@ -161,7 +165,11 @@ public abstract class CharacterHandler : EntityHandler
     protected override void Die()
     {
         isDead = true;
-        RespawnTime = Time.time + RespawnCooldown;
+        
+        if (base.IsServerInitialized)
+        {
+            respawnTick = base.TimeManager.Tick + (uint)base.TimeManager.TimeToTicks(RespawnCooldown);
+        }
 
         Renderer[] renderers = GetComponentsInChildren<Renderer>();
         foreach (Renderer r in renderers)

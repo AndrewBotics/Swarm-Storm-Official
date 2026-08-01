@@ -43,7 +43,7 @@ public class NeuroShot : ProjectileHandler
     {
         if (generation > 0)
         {
-            float step = speed * Time.deltaTime;
+            float step = speed * (float)base.TimeManager.TickDelta;
             transform.position = Vector3.MoveTowards(transform.position, targetPosition, step);
         }
         else
@@ -75,7 +75,7 @@ public class NeuroShot : ProjectileHandler
     {
         if (projectilePrefab != null)
         {
-            Transform target = Constants.FindClosestTarget(transform, projectileTeam, maxDistance * 2);
+            Transform target = Constants.FindClosestTarget(transform, projectileTeam, maxDistance);
             Vector3 nextVectorData; 
             
             if (target != null)

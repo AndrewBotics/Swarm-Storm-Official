@@ -8,40 +8,12 @@ public class HomingProjectileHandler : ProjectileHandler
     private float acceleration = 2.5f;
     private float maxSpeed = 20f;
 
-    protected override void Update()
-    {
-        
-    }
-
     public void Setup(EntityHandler ent, Transform newTarget, float dmg, float spd)
     {
-        shooter = ent;
-        projectileTeam = ent.EntityTeam;
+        base.Setup(ent, dmg, spd, 100f);
         target = newTarget;
-        damage = dmg;
-        speed = spd;
     }
-
-    public override void OnStartServer()
-    {
-        base.OnStartServer();
-        base.TimeManager.OnTick += TimeManager_OnTick;
-    }
-
-    public override void OnStopServer()
-    {
-        base.OnStopServer();
-        if (base.TimeManager != null)
-        {
-            base.TimeManager.OnTick -= TimeManager_OnTick;
-        }
-    }
-
-    private void TimeManager_OnTick()
-    {
-        MoveProjectile();
-    }
-
+    
     protected override void MoveProjectile()
     {
         if (target == null || !target.gameObject.activeInHierarchy)
@@ -62,8 +34,12 @@ public class HomingProjectileHandler : ProjectileHandler
         speed += acceleration * delta;
         if (speed > maxSpeed) speed = maxSpeed;
 
-        Vector3 direction = (target.position - transform.position).normalized;
-        transform.LookAt(target);
+        EntityHandler eHandler = target.GetComponent<EntityHandler>();
+        Vector3 targetPos = (eHandler != null) ? eHandler.CenterPoint : target.position;
+
+        Vector3 direction = (targetPos - transform.position).normalized;
+        
+        transform.LookAt(targetPos);
         
         transform.position += direction * speed * delta;
     }

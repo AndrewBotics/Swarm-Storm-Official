@@ -1,9 +1,14 @@
 using UnityEngine;
-using System.Collections;
 
 public class NeuroBeam : ProjectileHandler
 {
-    private float tickRate;
+    private uint tickRateTicks;
+    private uint endTick;
+    private uint nextDamageTick;
+    
+    private uint destroyTick;
+    private bool isStopping = false;
+
     private Vector3 extents;
     private Transform casterTransform;
     private Vector3 positionOffset;
@@ -14,17 +19,21 @@ public class NeuroBeam : ProjectileHandler
     {
         base.Setup(neuro, totalDamage / ticks, 0f, range);
         
-        tickRate = duration / ticks;
         extents = new Vector3(width / 2f, 2f, range / 2f);
         casterTransform = caster;
         positionOffset = transform.position - caster.position;
         
         beamParticles = GetComponent<ParticleSystem>();
         
-        StartCoroutine(BeamRoutine(duration));
+        if (neuro.IsServerInitialized)
+        {
+            tickRateTicks = (uint)neuro.TimeManager.TimeToTicks(duration / ticks);
+            endTick = neuro.TimeManager.Tick + (uint)neuro.TimeManager.TimeToTicks(duration);
+            nextDamageTick = neuro.TimeManager.Tick;
+        }
     }
 
-    protected override void Update()
+    protected override void MoveProjectile()
     {
         if (casterTransform != null)
         {
@@ -33,24 +42,26 @@ public class NeuroBeam : ProjectileHandler
         }
     }
 
-    private IEnumerator BeamRoutine(float duration)
+    protected override void CheckMaxDistance()
     {
-        float endTime = Time.time + duration;
-        
-        while (Time.time < endTime)
+        if (endTick == 0) return; 
+
+        if (!isStopping && base.TimeManager.Tick >= endTick)
+        {
+            isStopping = true;
+            if (beamParticles != null) beamParticles.Stop();
+            
+            destroyTick = base.TimeManager.Tick + (uint)base.TimeManager.TimeToTicks(0.5f);
+        }
+        else if (isStopping && base.TimeManager.Tick >= destroyTick)
+        {
+            DestroyProjectile();
+        }
+        else if (!isStopping && base.TimeManager.Tick >= nextDamageTick)
         {
             TickDamage();
-            yield return new WaitForSeconds(tickRate);
+            nextDamageTick += tickRateTicks;
         }
-        
-        if (beamParticles != null)
-        {
-            beamParticles.Stop(); 
-        }
-
-        yield return new WaitForSeconds(0.5f);
-        
-        DestroyProjectile();
     }
 
     private void TickDamage()

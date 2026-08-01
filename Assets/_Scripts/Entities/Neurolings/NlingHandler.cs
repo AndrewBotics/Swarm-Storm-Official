@@ -139,7 +139,7 @@ public abstract class NlingHandler : EntityHandler
 
     protected void ConvertToTeam(int newTeam)
     {
-        EntityTeam = newTeam;
+        SetTeam(newTeam);
         SetHPValue(EntityMaxHP);
         SetHP(1.0f);
 
