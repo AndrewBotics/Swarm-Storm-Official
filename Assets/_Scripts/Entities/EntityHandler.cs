@@ -25,7 +25,7 @@ public abstract class EntityHandler : NetworkBehaviour
     protected int EntityLevel = 1;
     protected float EntityHPMultiplier = 1.0f;
     protected float EntityAttackMultiplier = 1.0f;
-    protected readonly SyncVar<float> EntityCurrentHP = new SyncVar<float>();
+    [System.NonSerialized] private readonly SyncVar<float> EntityCurrentHP = new SyncVar<float>();
     protected float EntityMaxHP;
 
     // Statuses

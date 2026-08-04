@@ -42,9 +42,13 @@ public class NeuroHandler : CharacterHandler
         EntityName = "NeuroPlayer";
         EntityBaseHP = NeuroBaseHP;
         EntityMaxHP = NeuroBaseHP;
-        SetHPValue(NeuroBaseHP);
         EntityBaseSpeed = NeuroBaseSpeed;
-        EntityTeam = Constants.TEAM1;
+    }
+
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
+        SetHPValue(NeuroBaseHP);
     }
     
     public override void OnStartClient()
